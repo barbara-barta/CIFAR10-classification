@@ -16,6 +16,8 @@ train_loader, val_loader, test_loader = get_loaders(
 )
 
 model_exists = list(Path(f"models/{model_name}").glob("*.tar"))
+model_path = model_exists[0] if model_exists else f"models/{model_name}/{model_name}.tar"
+
 model = SixLayerPoolCNN().to(device)
 
 # -------------------------
