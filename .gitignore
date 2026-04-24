@@ -1,0 +1,13 @@
+
+# virtual environments
+venv/
+.env/
+env/
+CIFAR10_classification/
+
+data/
+.vscode/
+ZIPS/
+notes.txt
+CutMix.pdf
+image_classification.ipynb
