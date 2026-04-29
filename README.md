@@ -94,9 +94,7 @@ We plot the root mean square (RMS) of the outputs of each of the convolutional l
 <p align="center">
   <img width="700" alt="image" src="https://github.com/barbara-barta/CIFAR10-classification/blob/main/figures/model0_RMS.png?raw=true" />
 </p>
-We see that the output size seems to increase within the layers. Each subsequent layer is receiving inputs that are larger in the RMS sense. This is known as internal covariate shift: the input to each module has a different distribution. This leads to sub-optimal training. 
-
-To correct this behavior, we add batch normalization to the model. We observe the following training loss behavior. 
+We see that the output size seems to increase within the layers. Each subsequent layer is receiving inputs that are larger in the RMS sense. We add batch normalization to the model. Batch normalization acts on the intermediate layer inputs by first normalizing them to have unit variance and zero mean, and then scaling and shifting them by some learned parameters. Batch normalization acts as a regulizer by injecting some noise in the data, and it smooths the loss surface. This makes training faster. After adding BatchNorm, we observe the following training loss behavior. 
 <p align="center">
   <img width="400" alt="image" src="https://github.com/barbara-barta/CIFAR10-classification/blob/main/figures/model1.png?raw=true" />
 </p>
