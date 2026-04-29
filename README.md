@@ -66,7 +66,7 @@ The architecture is as follows:
 <p align="center">
   <img width="800" alt="image" src="https://github.com/barbara-barta/CIFAR10-classification/blob/main/figures/network_diagram.png?raw=true" />
 </p>
-For training we use the Adam optimizer with a step learning rate scheduler with gamma = 0.5, and step size 10. We train on 150 epochs with a patience of 20 and use the cross entropy loss. In training, we use data augmentation consisting of a random crop, a horizontal flip and color jitter. 
+For training we use the Adam optimizer with a step learning rate scheduler with an inital learning rate 0.003, gamma = 0.5, and step size 10. We train on 150 epochs with a patience of 20 and use the cross entropy loss. In training, we use data augmentation consisting of a random crop, a horizontal flip and color jitter. 
 
 
 ## Results (TL;DR)
@@ -76,7 +76,7 @@ For training we use the Adam optimizer with a step learning rate scheduler with 
 - **Key Insight:** In cat vs dog classification, the model relies heavily on localized facial features (snout), 
 leading to poor robustness under occlusion or viewpoint changes.
 
-## Evaluation 
+## Experiments 
 
 We load the data and perform simple EDA to confirm that the classes are well balanced and that there is plenty of intra-class variation. We create the augmented and non-augmented data loaders and proceed to make simple one layer, two layer and four layer CNNs. We explore the effect of pooling and data augmentation. More details can be found in the notebook.
 Next we create a simple 6 layer network with 6 convolutional layers of size 32, 32, 64, 64, 128, 128, ReLu activations and max pooling after the second and fourth convolutional layer. We train the network on 60 epochs with a patience of 10. The training loss curve shows signs of overfitting as the training loss increases, while the validation accuracy stagnates:
@@ -109,11 +109,11 @@ We make some further observations, such as the variability of the RMS decreasing
 The next addition we explore is skip connections. Skip connections help when training deeper neural networks by allowing lower level information to flow more easily into the deeper parts of the network. With the addition of skip connections, the model achieves a test accuracy of 85.72%.
 Finally, we add learning rate scheduling. Schedulers can help the model converge better by allowing it to take larger steps in the beginning and smaller steps as it gets closer to a minimum. The test accuracy is 85.96%.
 
-We explore some other models, and then choose the best model. We do this by selecting the top 4 performing models, training each one 3 times for 100 epochs with a patience of 20. The six layer model with data augmentation, batch normalization, skip connections and a learning rate scheduler achieves the highest mean accuracy, 87,38%. Ideally we would run paired t-tests to prove that this model is actually better than the other ones, but given the limited sample size, the test will not have sufficient statistical power to yield meaningful conclusions. Given the small number of runs, we do not claim statistical significance. 
+We explore some other models, and then choose the best model. We do this by selecting the top 4 performing models, training each one 3 times for 100 epochs with a patience of 20. The six layer model with data augmentation, batch normalization, skip connections and a learning rate scheduler achieves the highest mean accuracy, 0,8738 and a standard deviation of 0,0017. Ideally we would run paired t-tests to prove that this model is actually better than the other ones, but given the limited sample size, the test will not have sufficient statistical power to yield meaningful conclusions. Given the small number of runs, we do not claim statistical significance. 
 Instead, we select the model based on highest mean accuracy and consistent performance across runs.
 
 ## Best model analysis
-We rerun the model for 150 epochs and with 20 patience. The final model achieves accuracy of 87,67%, a macro averaged F-score of 0.8773 and shows the following train accuracy curve:
+We choose the six layer model with data augmentation, batch normalization, skip connections and a learning rate scheduler as the best performing model. We rerun the model for 150 epochs and with 20 patience. The final model achieves accuracy of 87,67%, a macro averaged F-score of 0.8773 and shows the following train accuracy curve:
 <p align="center">
   <img width="400" alt="image" src="https://github.com/barbara-barta/CIFAR10-classification/blob/main/figures/final_model.png?raw=true" />
 </p>
@@ -135,7 +135,7 @@ It seems that the model mainly focuses on the dog's face, particularly the snout
   <img width="250" alt="image" src="https://github.com/barbara-barta/CIFAR10-classification/blob/main/figures/red_dog.png?raw=true" />
 </p>
 In many of these images, the snout is not recognizable, either due to a strange angle, or due to low contrast between the snout and the color of the hair around it.
-It seems that the model has learned a shortcut feature for “dog” — it heavily relies on snout/face-specific patterns. When that feature is clear, it succeeds; when it is obscured (angle, lighting, contrast), performance drops. The CNN has insufficient robustness to viewpoint + appearance variation. It likely under-utilizes global shape, texture and color. Take for example the last two misclassified samples. That reddish fur color is much more common in dogs than in cats, yet the model does not recognize this.
+It seems that the model has learned a shortcut feature for “dog” — it heavily relies on snout/face-specific patterns. When that feature is clear, it succeeds; when it is obscured (angle, lighting, contrast), performance drops. The CNN has insufficient robustness to viewpoint + appearance variation. It likely under-utilizes global shape, texture and color, as well as contextual cues. Take for example the second missclassified image. There are several clues which we might use to deduce it is an image of a dog: the tongue is sticking out and the color of the fur is much more common in dogs than in cats. But the model fails to recognize this.
 
 ## Limitations and Future work
 As described in the previous section, the model heavily focuses on one feature - the snout. One possible solution to this problem would be to add data augmentation that specifically targets this feature over-reliance. One example is the 'Cutout' data augmentation which randomly masks square regions of the input image during training. Another regularization strategy for reducing feature over-reliance is the 'CutMix' augmentation. Here, patches are cut and pasted among training images where the ground truth labels are also mixed proportionally to the area of the patches. This way, we might end up with a training image that contains the head of a cat, but the body of a dog. Trained on this example, the classifier use the cat's head to make a prediction of the label 'cat', and the dog's feet to make a prediction of a 'dog' label. The technique is similar to the 'Cutout' technique, only it uses the training pixels more efficiently since we are not replacing a random part of the image with black pixels. 
@@ -163,14 +163,13 @@ In comparison, increasing the number of layers to six gives modest gains, with t
 
 ## Acknowledgements/References
 ### Libraries
-- PyTorch — model training
-- NumPy — numerical operations
-- scikit-learn — evaluation metrics
-- Matplotlib — visualization
+- PyTorch - model training
+- NumPy - numerical operations
+- scikit-learn - evaluation metrics
+- Matplotlib - visualization
 ### Datasets, articles
-- CIFAR-10 — https://www.cs.toronto.edu/~kriz/cifar.html  
-  Used for training; images normalized and augmented.
+- CIFAR-10 - Used for training; images normalized and augmented. https://www.cs.toronto.edu/~kriz/cifar.html  
+- Selvaraju et al., *Grad-CAM: Visual Explanations from Deep Networks via Gradient-based Localization*, 2019 [https://arxiv.org/pdf/1610.02391](https://arxiv.org/pdf/1610.02391)
 - Yun et al., *CutMix: Regularization Strategy to Train Strong Classifiers
-with Localizable Features*, 2019  
-  [https://arxiv.org/abs/1512.03385](https://arxiv.org/abs/1905.04899)
-- *Implementing Grad-CAM in PyTorch* by Stepan Ulyanin — [Medium article](https://medium.com/@stepanulyanin/implementing-grad-cam-in-pytorch-ea0937c31e82)
+with Localizable Features*, 2019 [https://arxiv.org/abs/1512.03385](https://arxiv.org/abs/1905.04899)
+- *Implementing Grad-CAM in PyTorch* by Stepan Ulyanin - [Medium article](https://medium.com/@stepanulyanin/implementing-grad-cam-in-pytorch-ea0937c31e82)
