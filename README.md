@@ -25,18 +25,17 @@ The final model architecture contains:
 - Fully connected classifier
 
 The structure is as follows:
-1. input: 3 channels
-2. 32 channels: [Conv → BN → ReLU] ×2 + Skip → Pool
-3. 64 channels: [Conv → BN → ReLU] ×2 + Skip → Pool
-4. 128 channels: [Conv → BN → ReLU] ×2 + Skip
-5. → FC → 10 classes
 
+
+<p align="center">
+  <img width="800" alt="image" src="https://github.com/barbara-barta/CIFAR10-classification/blob/main/figures/network_diagram.png?raw=true" />
+</p>
 For training we use the Adam optimizer with a step learning rate scheduler with gamma = 0.5, and step size 10. We trian on 150 epochs with a patience of 20 and use the cross entropy loss. In training, we use data augmentation consistic of a random crop, a horizontal flip and color jitter. 
 
 ## Evaluation 
 
-We load the data and perform simple EDA to confirm that the classes are well balanced and that there is plenty of intra-class variation. We create the augmented and non-augmented data loaders and proceed to make simple 1 layer and 2 layer CNNs. We explore the effect of pooling. We then create a four layer CNN, on which we explore the effect of data augmentation. More details can be found in the notebook.
-Next we create a simple 6 layer network with 6 convolutional layers of size 32, 32, 64, 64, 128, 128, ReLu activations and max pooling after the second and fourth convolutional layer. The training loss curve shows signs of overfitting as the trianing loss increases, while the validation accuracy stagnates:of over
+We load the data and perform simple EDA to confirm that the classes are well balanced and that there is plenty of intra-class variation. We create the augmented and non-augmented data loaders and proceed to make simple one layer, two layer and four layer CNNs. We explore the effect of pooling and data augmentation. More details can be found in the notebook.
+Next we create a simple 6 layer network with 6 convolutional layers of size 32, 32, 64, 64, 128, 128, ReLu activations and max pooling after the second and fourth convolutional layer. We train the network on 60 epochs with a patience of 10. The training loss curve shows signs of overfitting as the training loss increases, while the validation accuracy stagnates:
 <p align="center">
   <img width="400" alt="image" src="https://github.com/barbara-barta/CIFAR10-classification/blob/main/figures/6layer_vanilla.png?raw=true" />
 </p>
@@ -46,7 +45,7 @@ Overfitting is ammended by adding data augmentation to the model:
 <p align="center">
   <img width="400" alt="image" src="https://github.com/barbara-barta/CIFAR10-classification/blob/main/figures/4layersDA.png?raw=true" />
 </p>
-As the model is exposed to a greater variety of data, and it no longer repeats training samples on each epoch, its ability to generalize increases. The final test accuracy of the four layer network with data augumentation is 84.81%.
+As the model is exposed to a greater variety of data, and it no longer repeats training samples on each epoch, its ability to generalize increases. Using the same training parameters as in the previous model, the final test accuracy of the six layer network with data augumentation is 84.81%.
 We plot the root mean square (RMS) of the outputs of each of the convolutional layers retrieved during training, plotted against the training batch. We make these plots to study the size of the outputs of each layer, which are then fed into the subsequent layer. We take the RMS as a measure of size, since it accounts for the number of features in each layer and the size of the input to each layer.
 <p align="center">
   <img width="700" alt="image" src="https://github.com/barbara-barta/CIFAR10-classification/blob/main/figures/model0_RMS.png?raw=true" />
@@ -57,15 +56,16 @@ To correct this behaviour, we add batch normalization to the model. We observe t
 <p align="center">
   <img width="400" alt="image" src="https://github.com/barbara-barta/CIFAR10-classification/blob/main/figures/model1.png?raw=true" />
 </p>
-Note that we reach 80% accuracy in about half the time as without batch norm. The RMS plots also show that the layer inputs stay on the same scale for all layers. 
+We see an expected added benefit of batch normalization: we reach 80% accuracy in about half the time as without batch norm. Also, the RMS plots also show that the layer inputs stay on the same scale for all layers. 
 <p align="center">
   <img width="700" alt="image" src="https://github.com/barbara-barta/CIFAR10-classification/blob/main/figures/model1_RMS.png?raw=true" />
 </p>
-The next addition we explore is skip connections. The model achieves a test accuracy of 85.72%. Wwe make some further observations, such as the variability of the RMS decreasing through adding batch norm, and argue why that might be the case. More details can be found in the notebook. 
+We make some further observations, such as the variability of the RMS decreasing through adding batch norm, and argue why that might be the case. More details can be found in the notebook. 
 
+The next addition we explore is skip connections. Skip connections help when training deeper neural networks by allowing lower level information to flow more easily into the deeper parts of the network. With the addition of skip connections, the model achieves a test accuracy of 85.72%.
 Finally, we add learning rate scheduling. Schedulers can help the model converge better by allowing it to take larger steps in the beginning and smaller steps as it gets closer to a minimum. The test accuracy is 85.96%.
 
-We explore some other models, such as one with reduced number of pooling layers. We then chose the best model. We do this by selecting the top 4 performing models, training each one 3 times for 100 epochs with a patience of 20. We compute the confidence interval of the accuracy of each model. One model has a strictly higher accuracy CI than the rest of the models. This is the model with batchnorm, skip connections and learning rate scheduling. 
+We explore some other models, and then chose the best model. We do this by selecting the top 4 performing models, training each one 3 times for 100 epochs with a patience of 20. We compute the confidence interval of the accuracy of each model. One model has a strictly higher accuracy CI than the rest of the models. This is the model with batchnorm, skip connections and learning rate scheduling. 
 
 ## Best model analysis
 
