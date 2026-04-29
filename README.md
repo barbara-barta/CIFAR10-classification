@@ -79,15 +79,15 @@ The curve shows convergence and only a minor sign of overfitting, as the train a
 Classes which are most often correctly classified are automobile, ship and truck. Classes which the model struggles the most with are dog, cat and bird. This makes sense intuitively, since vehicles have simpler textures, and their edges are non-deformable, while animals can change shape more drastically depending on the position they take. The biggest confusion seems to be between the classes 'cat' and 'dog'. We dive deeper into this issue by making grad-CAM plots. Gradient-weighted Class Activation Mapping (Grad-CAM) is an explainable AI technique that creates heatmaps to visualize which regions of an image a CNN-based model focuses on to make predictions. By using gradients of a target concept flowing into the final convolutional layer, it highlights the most important features in the image. 
 We first plot grad-CAMs of the images of dogs which were correctly classified. 
 <p align="center">
-  <img width="300" alt="image" src="https://github.com/barbara-barta/CIFAR10-classification/blob/main/figures/snout_dog.png?raw=true" />
-  <img width="300" alt="image" src="https://github.com/barbara-barta/CIFAR10-classification/blob/main/figures/snout_dog2.png?raw=true" />
-  <img width="300" alt="image" src="https://github.com/barbara-barta/CIFAR10-classification/blob/main/figures/snout_dog3.png?raw=true" />
+  <img width="250" alt="image" src="https://github.com/barbara-barta/CIFAR10-classification/blob/main/figures/snout_dog.png?raw=true" />
+  <img width="250" alt="image" src="https://github.com/barbara-barta/CIFAR10-classification/blob/main/figures/snout_dog2.png?raw=true" />
+  <img width="250" alt="image" src="https://github.com/barbara-barta/CIFAR10-classification/blob/main/figures/snout_dog3.png?raw=true" />
 </p>
 It seems that the model mainly focuses on the dog's face, particularly the snout region. We then plot grad-CAMs of images of dogs that were misclassified as cats.
 <p align="center">
-  <img width="300" alt="image" src="https://github.com/barbara-barta/CIFAR10-classification/blob/main/figures/no_snout_dog.png?raw=true" />
-  <img width="300" alt="image" src="https://github.com/barbara-barta/CIFAR10-classification/blob/main/figures/no_snout_dog2.png?raw=true" />
-  <img width="300" alt="image" src="https://github.com/barbara-barta/CIFAR10-classification/blob/main/figures/red_dog.png?raw=true" />
+  <img width="250" alt="image" src="https://github.com/barbara-barta/CIFAR10-classification/blob/main/figures/no_snout_dog.png?raw=true" />
+  <img width="250" alt="image" src="https://github.com/barbara-barta/CIFAR10-classification/blob/main/figures/no_snout_dog2.png?raw=true" />
+  <img width="250" alt="image" src="https://github.com/barbara-barta/CIFAR10-classification/blob/main/figures/red_dog.png?raw=true" />
 </p>
 In a lot of these images, the snout is not recognizable, either due to a strange angle, or due to low contrast between the snout and the color of the hair around it.
 It seems that the model has learned a shortcut feature for “dog” — it heavily relies on snout/face-specific patterns. When that feature is clear, it succeeds; when it’s obscured (angle, lighting, contrast), performance drops. The CNN has insufficient robustness to viewpoint + appearance variation. It likely underutilizes global shape, texture and color. Take for example the last two misclassified samples. That reddish fur color is much more common in dogs than it is in cats, yet the model does not recognize this.
